@@ -31,6 +31,7 @@
   "devDependencies": {
     "@eslint/js": "^9.30.1",
     "@midscene/web": "^0.20.1",
+    "@playwright/test": "^1.53.2",
     "@types/node": "^24.0.10",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
@@ -41,5 +42,8 @@
     "puppeteer": "^24.11.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "playwright": "^1.53.2"
   }
 }
