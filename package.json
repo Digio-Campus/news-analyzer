@@ -1,0 +1,45 @@
+{
+  "name": "news-analyzer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "PoC para análisis automatizado de comentarios de noticias usando Midscene y Puppeteer",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/main.ts",
+    "dev": "tsx --watch src/main.ts",
+    "demo": "tsx examples/basic-demo.ts",
+    "clean": "rimraf dist",
+    "lint": "eslint src examples --ext .ts",
+    "lint:fix": "eslint src examples --ext .ts --fix",
+    "format": "prettier --write src examples",
+    "check": "npm run lint && npm run format"
+  },
+  "keywords": [
+    "puppeteer",
+    "midscene",
+    "web-scraping",
+    "ai",
+    "news-analysis",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@midscene/web": "^0.20.1",
+    "@types/node": "^24.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "dotenv": "^17.0.1",
+    "eslint": "^9.30.1",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.6.2",
+    "puppeteer": "^24.11.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
