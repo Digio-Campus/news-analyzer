@@ -2,6 +2,7 @@
 
 import { test } from './fixture'; // desde e2e/fixture.ts
 import { expect } from '@playwright/test';
+import { sleep } from '../src/utils';
 
 test.beforeEach(async ({ page }) => {
     const newsUrl = process.env.NEWS_URL;
@@ -23,6 +24,9 @@ test('Extraer comentarios de noticias', async ({
     // Use aiTap to click search button
     await aiTap('Aceptar botón de cookies o privacidad si aparece');
 
+    await sleep(3000);
+
+
     // Use aiScroll to scroll to bottom
     await aiScroll(
         {
@@ -30,7 +34,9 @@ test('Extraer comentarios de noticias', async ({
         scrollType: 'untilBottom',
         },
     );
-    
+
+    await sleep(5000); // Espera para que se cargue el contenido
+
     // Use aiScroll to scroll to the comments section
     let hasComments = await aiBoolean('¿existe una sección de comentarios o reseñas?');
     let attempts = 0;
@@ -42,17 +48,20 @@ test('Extraer comentarios de noticias', async ({
             distance: 700,
             scrollType: 'once',
             },
-        );  
+        ); 
         
-        await aiWaitFor('the loading spinner to disappear');
+        await sleep(3000);
+        
         hasComments = await aiBoolean('¿existe una sección de comentarios o reseñas?');
         attempts++;
+
+        await sleep(3000);
     }
 
     expect(hasComments).toBeTruthy();
 
     // Extraer los comentarios visibles
-    const comments = await aiQuery(`
+    const extract_comments = () => aiQuery(`
         {
         author: string,
         content: string,
@@ -60,7 +69,7 @@ test('Extraer comentarios de noticias', async ({
         emotion: "alegría"|"enfado"|"tristeza"|"neutral"
         }[],
         
-        Extrae TODOS los comentarios visibles en esta página de noticias. 
+        Extrae los comentarios visibles en esta página de noticias. 
         Para cada comentario encuentra:
             - author: nombre del usuario que comentó
             - content: texto completo del comentario
@@ -71,9 +80,43 @@ test('Extraer comentarios de noticias', async ({
         Busca palabras como: bien/mal, me gusta/no me gusta, estupendo/terrible, etc.
         Para la emoción, detecta: alegría (contento, genial), enfado (rabia, indignante), tristeza (triste, lamentable).
     `);
+    
+    // Use aiScroll to scroll to the comments section
+    let anyComments = true;
+    const allComments : any[] = [];
+    attempts = 0;
 
-    expect(comments.length).toBeGreaterThan(0);
+    while (anyComments && attempts < 5) {
+       const comments = await extract_comments();
 
-    console.log('✅ Comentarios extraídos:', comments.length);
+       await sleep(3000);
+
+       allComments.push(...comments); // Añade todos los elementos
+
+        await aiScroll(
+            {
+            direction: 'down',
+            distance: 800,
+            scrollType: 'once',
+            },
+        );  
+
+        await sleep(3000);
+
+        anyComments = await aiBoolean('quedan comentarios visibles?');
+
+        await sleep(3000);
+
+        attempts++;
+    }
+
+     // Filtrar duplicados por contenido al final
+    const uniqueComments = allComments.filter((comment, index, self) => 
+        self.findIndex(c => c.content === comment.content) === index
+    );
+
+    expect(uniqueComments.length).toBeGreaterThan(0);
+
+    console.log('✅ Comentarios extraídos:', uniqueComments.length);
     // Aquí puedes insertar validación con expect o lógica adicional
 });
