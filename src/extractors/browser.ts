@@ -8,7 +8,7 @@ export async function browseComments(url: string): Promise<Comment[]> {
 
   // Crear agente de Midscene
   const agent = new AgentOverChromeBridge();
-    
+
   console.log(`📄 Navegando a: ${url}`);
   await agent.connectNewTabWithUrl(url);
   await sleep(5000);
