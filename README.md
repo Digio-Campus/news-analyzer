@@ -46,8 +46,16 @@ npm start "https://url-de-la-noticia.com"
 Hay una demo de extracción de comentarios de eBay en `src/extractors/demo.ts`, para probarla hay que cambiar en la linea 19 de 'src/main.ts' la llamada a `extractComments(newsUrl)` por `extract_comments_demo()`.
 
 ### Análisis de comentarios usando Bridge Mode:
-Todavia no se ha implementado esta funcionalidad, pero se planea extender con scripts que usen el bridge mode de Midscene para una integración más visual.
-Para usarlo se necesita tener configurada la extension de Midscene en el navegador y ejecutar el script correspondiente.
+
+Para usarlo se necesita tener configurada la [extension de Midscene en Chrome](https://chromewebstore.google.com/detail/midscenejs/gbldofcpkknbggpkmbdaefngejllnief).
+
+Hay un único script, que es identico al de Puppeteer, pero en él se usa el `AgentOverChromeBridge` de Midscene para controlar el navegador. Esto permite una integración mucho más visual y permite mayor estabilidad al manejar uno mismo el navegador.
+
+Para ejecutar el script de análisis de comentarios con Bridge Mode, hay que usar el mismo comando, cambiando la llamada de `extractComments(newsUrl)` por `browseComments(newsUrl)` en `src/main.ts`:
+
+```bash
+npm start "https://url-de-la-noticia.com"
+```
 
 ### Análisis de comentarios usando tests de Playwright:
 
@@ -139,9 +147,10 @@ e2e/                     # Tests con Playwright
 - Solución temporal: reintentar la ejecución
 
 ### Planes de mejora
-- **Bridge Mode**: Se planea extender con scripts usando el bridge mode de Midscene
+- **Integrar Bridge Mode y Puppeteer**: Al usar la misma API, se puede unificar la lógica de extracción y seleccionar en tiempo de ejecución si usar Puppeteer o Bridge Mode.
 - **Robustez**: Mejorar manejo de errores y reintentos
 - **Estabilidad**: Perfeccionar los scripts existentes
+
 
 
 ## 📚 Recursos
