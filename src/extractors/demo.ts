@@ -5,7 +5,7 @@ import { filterComments, sleep } from '../utils';
 
 export async function extract_comments_demo(): Promise<Comment[]> {
   const browser = await puppeteer.launch({
-    headless: false, // here we use headed mode to help debug
+    headless: true, // here we use headed mode to help debug
   });
 
   const page = await browser.newPage();

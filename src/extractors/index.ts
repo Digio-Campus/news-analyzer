@@ -29,7 +29,12 @@ export async function extractComments(url: string): Promise<Comment[]> {
     forceSameTabNavigation: true,
   });
 
-  await agent.ai(`Accept the cookies and privacy policy if required.`);
+  const hasCookieBanner = await agent.aiBoolean(
+    'is there a cookie consent banner?'
+  );
+  if (hasCookieBanner) {
+    await agent.ai(`Accept the cookies and privacy policy.`);
+  }
   await sleep(5000);
 
   // Especulación: Los comentarios suelen estar al final de la página
