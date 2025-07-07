@@ -23,6 +23,8 @@ export default [
         __filename: 'readonly',
         global: 'readonly',
         Buffer: 'readonly',
+        // Globals del navegador/DOM
+        URL: 'readonly',
       },
     },
     plugins: {

@@ -9,7 +9,7 @@ async function main(newsUrl: string) {
   // Validar URL
   try {
     new URL(newsUrl);
-  } catch (error) {
+  } catch {
     console.error('❌ URL inválida:', newsUrl);
     return;
   }

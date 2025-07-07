@@ -8,9 +8,9 @@ export function sleep(ms: number): Promise<void> {
 export const filterComments = (commentsData: Comment[]): Comment[] => {
   const validComments = commentsData
     .filter(
-      (comment: any) => comment.content && comment.content.trim().length > 0
+      (comment: Comment) => comment.content && comment.content.trim().length > 0
     )
-    .map((comment: any) => ({
+    .map((comment: Comment) => ({
       author: comment.author || 'Usuario Anónimo',
       content: comment.content.trim(),
       sentiment: comment.sentiment || 'neutral',
