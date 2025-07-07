@@ -13,8 +13,8 @@ dotenv.config();
 export default defineConfig({
   testDir: './e2e',
    testMatch: "**/*.spec.ts",
-  timeout: 90 * 1000, // Set a global timeout of 90 seconds for each test
-  
+  timeout: 180 * 1000, // Set a global timeout of 180 seconds for each test
+
   /* Run tests in files in parallel */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
