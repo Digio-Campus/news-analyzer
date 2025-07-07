@@ -35,7 +35,7 @@ test('Extraer comentarios de noticias', async ({
         },
     );
 
-    await sleep(5000); // Espera para que se cargue el contenido
+    await sleep(3000); // Espera para que se cargue el contenido
 
     // Use aiScroll to scroll to the comments section
     let hasComments = await aiBoolean('¿existe una sección de comentarios o reseñas?');
@@ -50,12 +50,12 @@ test('Extraer comentarios de noticias', async ({
             },
         ); 
         
-        await sleep(3000);
+        await sleep(1000);
         
         hasComments = await aiBoolean('¿existe una sección de comentarios o reseñas?');
         attempts++;
 
-        await sleep(3000);
+        await sleep(1000);
     }
 
     expect(hasComments).toBeTruthy();
@@ -89,7 +89,7 @@ test('Extraer comentarios de noticias', async ({
     while (anyComments && attempts < 5) {
        const comments = await extract_comments();
 
-       await sleep(3000);
+       await sleep(1000);
 
        allComments.push(...comments); // Añade todos los elementos
 
@@ -101,11 +101,11 @@ test('Extraer comentarios de noticias', async ({
             },
         );  
 
-        await sleep(3000);
+        await sleep(1000);
 
         anyComments = await aiBoolean('quedan comentarios visibles?');
 
-        await sleep(3000);
+        await sleep(1000);
 
         attempts++;
     }
@@ -118,5 +118,4 @@ test('Extraer comentarios de noticias', async ({
     expect(uniqueComments.length).toBeGreaterThan(0);
 
     console.log('✅ Comentarios extraídos:', uniqueComments.length);
-    // Aquí puedes insertar validación con expect o lógica adicional
 });
