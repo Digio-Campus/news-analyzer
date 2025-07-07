@@ -3,6 +3,7 @@
 import { test } from './fixture'; // desde e2e/fixture.ts
 import { expect } from '@playwright/test';
 import { sleep } from '../src/utils';
+import { generateStats } from '../src/analyzers';
 
 test.beforeEach(async ({ page }) => {
     const newsUrl = process.env.NEWS_URL;
@@ -64,6 +65,7 @@ test('Extraer comentarios de noticias', async ({
     const extract_comments = () => aiQuery(`
         {
         author: string,
+        date: string,
         content: string,
         sentiment: "positivo"|"negativo"|"neutral",
         emotion: "alegría"|"enfado"|"tristeza"|"neutral"
@@ -72,6 +74,7 @@ test('Extraer comentarios de noticias', async ({
         Extrae los comentarios visibles en esta página de noticias. 
         Para cada comentario encuentra:
             - author: nombre del usuario que comentó
+            - date : fecha y hora del comentario
             - content: texto completo del comentario
             - sentiment: analiza si el comentario es positivo, negativo o neutral
             - emotion: detecta la emoción principal (alegría, enfado, tristeza, o neutral)
@@ -110,12 +113,14 @@ test('Extraer comentarios de noticias', async ({
         attempts++;
     }
 
-     // Filtrar duplicados por contenido al final
+     // Filtrar duplicados por autor y fecha al final
     const uniqueComments = allComments.filter((comment, index, self) => 
-        self.findIndex(c => c.content === comment.content) === index
+        self.findIndex(c => c.author === comment.author && c.date === comment.date) === index
     );
 
     expect(uniqueComments.length).toBeGreaterThan(0);
 
     console.log('✅ Comentarios extraídos:', uniqueComments.length);
+    generateStats(uniqueComments);
+
 });
