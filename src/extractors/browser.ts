@@ -1,6 +1,6 @@
 import { AgentOverChromeBridge } from '@midscene/web/bridge-mode';
 import { Comment } from '../types';
-import { filterComments, sleep } from '../utils';
+import { sleep } from '../utils';
 
 // Función para extraer comentarios con análisis de sentimiento
 export async function browseComments(url: string): Promise<Comment[]> {
@@ -74,7 +74,5 @@ export async function browseComments(url: string): Promise<Comment[]> {
 
   await agent.destroy();
 
-  // Paso 3: Validar y limpiar datos
-  const validComments = filterComments(commentsData);
-  return validComments;
+  return commentsData as Comment[];
 }

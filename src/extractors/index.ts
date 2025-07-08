@@ -1,11 +1,13 @@
 import puppeteer from 'puppeteer';
 import { PuppeteerAgent } from '@midscene/web/puppeteer';
 import { Comment } from '../types';
-import { filterComments, sleep } from '../utils';
+import { sleep } from '../utils';
 
 // Función para extraer comentarios con análisis de sentimiento
 export async function extractComments(url: string): Promise<Comment[]> {
   console.log('🚀 Iniciando extracción de comentarios...');
+
+  //Inicializar Puppeteer y agente de Midscene
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -29,6 +31,8 @@ export async function extractComments(url: string): Promise<Comment[]> {
     forceSameTabNavigation: true,
   });
 
+  // Logica de extracción de comentarios
+
   const hasCookieBanner = await agent.aiBoolean(
     'is there a cookie consent banner?'
   );
@@ -37,6 +41,7 @@ export async function extractComments(url: string): Promise<Comment[]> {
   }
   await sleep(5000);
 
+  // Paso 1: Navegar a la sección de comentarios
   // Especulación: Los comentarios suelen estar al final de la página
   await agent.aiScroll({ direction: 'down', scrollType: 'untilBottom' });
   await sleep(5000);
@@ -88,9 +93,9 @@ export async function extractComments(url: string): Promise<Comment[]> {
 
   console.log(`✅ Encontrados y analizados ${commentsData.length} comentarios`);
 
+  // Cerrar el navegador o el agente
+
   await browser.close();
 
-  // Paso 3: Validar y limpiar datos
-  const validComments = filterComments(commentsData);
-  return validComments;
+  return commentsData as Comment[];
 }

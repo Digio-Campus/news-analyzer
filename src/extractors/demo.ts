@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import { PuppeteerAgent } from '@midscene/web/puppeteer';
 import { Comment } from '../types';
-import { filterComments, sleep } from '../utils';
+import { sleep } from '../utils';
 
 export async function extract_comments_demo(): Promise<Comment[]> {
   const browser = await puppeteer.launch({
@@ -34,6 +34,9 @@ export async function extract_comments_demo(): Promise<Comment[]> {
   await agent.aiAction(
     'click on the name of the first item in the search results'
   );
+  await sleep(5000);
+
+  await agent.aiWaitFor('the page to load the product details'); // Espera a que se cargue la página del producto -> da error si no  se carga la página
   await sleep(5000);
 
   // Especulación: Los comentarios suelen estar al final de la página
@@ -85,7 +88,5 @@ export async function extract_comments_demo(): Promise<Comment[]> {
 
   await browser.close();
 
-  // Paso 3: Validar y limpiar datos
-  const validComments = filterComments(commentsData);
-  return validComments;
+  return commentsData as Comment[];
 }

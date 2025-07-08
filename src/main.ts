@@ -1,6 +1,7 @@
 import 'dotenv/config'; // Cargar variables de entorno
 import { extractComments } from './extractors';
 import { generateStats } from './analyzers';
+import { filterComments } from './utils';
 
 async function main(newsUrl: string) {
   console.log('🎯 News Analyzer - PoC');
@@ -16,7 +17,10 @@ async function main(newsUrl: string) {
 
   try {
     // Extraer comentarios
-    const comments = await extractComments(newsUrl);
+    let comments = await extractComments(newsUrl);
+
+    // Validar y limpiar datos
+    comments = filterComments(comments);
 
     // Generar estadísticas
     generateStats(comments);
