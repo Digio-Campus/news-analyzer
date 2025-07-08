@@ -9,6 +9,7 @@
     "start": "tsx src/main.ts",
     "dev": "tsx --watch src/main.ts",
     "demo": "tsx examples/basic-demo.ts",
+    "fetch-comments": "tsx src/fetchComments.ts",
     "clean": "rimraf dist",
     "lint": "eslint src examples --ext .ts",
     "lint:fix": "eslint src examples --ext .ts --fix",
@@ -44,6 +45,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/node-fetch": "^2.6.12",
+    "node-fetch": "^3.3.2",
     "playwright": "^1.53.2"
   }
 }
