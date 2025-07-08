@@ -6,7 +6,7 @@ Prueba de concepto para análisis automatizado de comentarios de noticias usando
 
 1. **Clona el proyecto**
    ```bash
-   git clone https://github.com/Digio-Campus/news-analyzer
+   git clone https://github.com/Digio-Campus/news-analyzer.git
    ```
 
 2. **Instala dependencias:**
