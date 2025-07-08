@@ -3,6 +3,27 @@
 import { test } from './fixture'; // desde e2e/fixture.ts
 import { expect } from '@playwright/test';
 import { sleep } from '../src/utils';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Obtener el directorio actual de manera compatible con ESM y CommonJS
+const getCurrentDir = () => {
+  if (typeof __dirname !== 'undefined') {
+    return __dirname; // CommonJS
+  }
+  return path.dirname(fileURLToPath(import.meta.url)); // ESM
+};
+
+const currentDir = getCurrentDir();
+
+// Crea la carpeta si no existe
+const ensureOutputDir = () => {
+  const dir = path.join(currentDir, '../output');
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+};
 
 test.beforeEach(async ({ page }) => {
   const newsUrl = process.env.NEWS_URL;
@@ -19,15 +40,21 @@ test('Extraer comentarios de noticias', async ({
   aiTap,
   aiScroll,
 }) => {
+
+  ensureOutputDir();
     
   page.on('response', async (response) => {
     const url = response.url();
 
-    // Ajusta esto a la ruta real de comentarios en tu web
+    // Filtra las URLs que contienen '/comentarios' o '/comments'
     if (url.includes('/comentarios') || url.includes('/comments')) {
+      const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = path.join(currentDir, '../output', `comments-${timeStamp}.json`);
+
       try {
         const json = await response.json();
-        console.log('📥 Capturando comentarios de:', url, ' ', json);
+        fs.writeFileSync(filename, JSON.stringify(json, null, 2));
+        console.log('📥 Response guardada en', filename);
       } catch (err) {
         console.warn('❌ Error al parsear JSON de', url);
       }
@@ -37,13 +64,20 @@ test('Extraer comentarios de noticias', async ({
   page.on('request', async (request) => {
     const url = request.url();
 
+    // Filtra las URLs que contienen '/comentarios' o '/comments'
     if (url.includes('/comentarios') || url.includes('/comments')) {
-      console.log('📤 Request detectada:', {
+      const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = path.join(currentDir, '../output', `request-${timeStamp}.json`);
+      
+      const requestData = {
         method: request.method(),
         url,
         headers: request.headers(),
         postData: request.postData(),
-      });
+      };
+
+      fs.writeFileSync(filename, JSON.stringify(requestData, null, 2));
+      console.log('📥 Request guardada en', filename);
     }
   });
 
