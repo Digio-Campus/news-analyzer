@@ -1,5 +1,7 @@
 import { Comment } from '../types';
 
+export * from './extraction';
+
 // Función simple para hacer sleep
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
