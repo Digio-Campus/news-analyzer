@@ -15,10 +15,8 @@ const getCurrentDir = () => {
   return path.dirname(fileURLToPath(import.meta.url)); // ESM
 };
 
-const currentDir = getCurrentDir();
-
 // Crea la carpeta si no existe
-const ensureOutputDir = () => {
+const ensureOutputDir = (currentDir) => {
   const dir = path.join(currentDir, '../output');
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -40,16 +38,19 @@ test('Extraer comentarios de noticias', async ({
   aiTap,
   aiScroll,
 }) => {
+  
+  //Crea la carpeta de salida si no existe
+  const currentDir = getCurrentDir();
+  ensureOutputDir(currentDir);
 
-  ensureOutputDir();
-    
+  // Inicia la escucha de las respuestas y solicitudes de red
   page.on('response', async (response) => {
     const url = response.url();
 
     // Filtra las URLs que contienen '/comentarios' o '/comments'
     if (url.includes('/comentarios') || url.includes('/comments')) {
       const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = path.join(currentDir, '../output', `comments-${timeStamp}.json`);
+      const filename = path.join(currentDir, '../output', `response-${timeStamp}.json`);
 
       try {
         const json = await response.json();
@@ -81,8 +82,14 @@ test('Extraer comentarios de noticias', async ({
     }
   });
 
-  // Use aiTap to click search button
-  await aiTap('Aceptar botón de cookies o privacidad si aparece');
+  // Busca la sección de comentarios con MidScene para que se cargue y generen las solicitudes
+  const hasCookieBanner = await aiBoolean(
+    'is there a cookie consent banner?'
+  );
+
+  if (hasCookieBanner) {
+    await aiTap(`Accept the cookies and privacy policy.`);
+  } 
   await sleep(3000);
 
   // Use aiScroll to scroll to bottom
