@@ -35,11 +35,12 @@ async function fetchFromApi(articleId: string) {
     offset += evalCount(json, config.pagination.countField);
   }
 
-  const filename = path.join(projectRoot, 'output', `comments_${articleId}.json`);
-  fs.writeFileSync(
-    filename,
-    JSON.stringify(allComments, null, 2)
+  const filename = path.join(
+    projectRoot,
+    'output',
+    `comments_${articleId}.json`
   );
+  fs.writeFileSync(filename, JSON.stringify(allComments, null, 2));
   console.log(`✅ Comentarios guardados: ${allComments.length}`);
 }
 
