@@ -39,7 +39,6 @@ const args = process.argv.slice(2);
 const newsUrl = args[0];
 const useBridgeMode = args[1] === 'bridge' ? true : false;
 
-
 // Validar Argumentos
 if (!newsUrl) {
   console.error(
