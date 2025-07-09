@@ -25,7 +25,7 @@ Prueba de concepto para análisis automatizado de comentarios de noticias usando
 
 Esta sección no esta finalizada del todo, pero se pueden probar los scripts que se indican más adelante. 
 
-El principal problema encontrado es que los scripts de Puppeteer pueden fallar y terminar abruptamente, mostrando errores como "page closed" o "session terminated". Esto es un problema conocido y se planea mejorar la robustez de los scripts en el futuro.
+El principal problema encontrado es que los scripts Puppeteer puede fallar y terminar abruptamente, mostrando errores como "page closed" o "session terminated". Esto es un problema conocido y se planea mejorar la robustez de los scripts en el futuro.
 
 Además, el script de análisis de comentarios de noticias por ahora solo extrae los primeros comentarios que encuentra, y no sigue buscando nuevos comentarios. 
 
@@ -43,18 +43,16 @@ Funcionalidad principal para analizar comentarios de una noticia específica usa
 npm start "https://url-de-la-noticia.com"
 ```
 
-Hay una demo de extracción de comentarios de eBay en `src/extractors/demo.ts`, para probarla hay que cambiar en la linea 19 de 'src/main.ts' la llamada a `extractComments(newsUrl)` por `extract_comments_demo()`.
-
 ### Análisis de comentarios usando Bridge Mode:
 
 Para usarlo se necesita tener configurada la [extension de Midscene en Chrome](https://chromewebstore.google.com/detail/midscenejs/gbldofcpkknbggpkmbdaefngejllnief).
 
 Hay un único script, que es identico al de Puppeteer, pero en él se usa el `AgentOverChromeBridge` de Midscene para controlar el navegador. Esto permite una integración mucho más visual y permite mayor estabilidad al manejar uno mismo el navegador.
 
-Para ejecutar el script de análisis de comentarios con Bridge Mode, hay que usar el mismo comando, cambiando la llamada de `extractComments(newsUrl)` por `browseComments(newsUrl)` en `src/main.ts`:
+Para ejecutar el script de análisis de comentarios con Bridge Mode, hay que usar el mismo comando que para Puppeteer, pero añadiendo un segundo argumento `bridge` y activar la extensión de Midscene en Chrome:
 
 ```bash
-npm start "https://url-de-la-noticia.com"
+npm start "https://url-de-la-noticia.com" bridge
 ```
 
 ### Análisis de comentarios usando tests de Playwright:
@@ -86,8 +84,9 @@ src/
 ├── main.ts              # Punto de entrada principal
 │
 ├── extractors/          # Extracción de comentarios
-│   ├── index.ts         # Extractor principal de noticias
-│   └── demo.ts          # Demo de extracción de eBay
+│   ├── index.ts         # Punto de entrada para extractores
+│   ├── puppeteer.ts     # Extractor de comentarios con Puppeteer
+│   └── bridge.ts        # Extractor de comentarios con Bridge Mode
 │
 ├── analyzers/           # Análisis de comentarios
 │   └── index.ts         # Generación de estadísticas
@@ -96,7 +95,9 @@ src/
 │   └── index.ts         # Definición de Comment
 │
 └── utils/               # Utilidades
-    └── index.ts         # Funciones auxiliares
+    |── extraction.ts    # Funciones de extracción de comentarios abstractas
+    └── index.ts         # Funciones auxiliares basicas
+
 
 examples/
 └── basic-demo.ts        # Demo básico de Midscene con Puppeteer
@@ -110,6 +111,7 @@ e2e/                     # Tests con Playwright
 ## ⚙️ Scripts disponibles
 
 - `npm run start <url>` - Análisis de comentarios de una noticia con Puppeteer
+- `npm run start <url> bridge` - Análisis de comentarios de una noticia con Bridge Mode
 - `npm run demo` - Demo básico de Midscene para comprobar la integración con Puppeteer
 - `npm run build` - Compilar TypeScript
 - `npm run dev` - Modo desarrollo con watch
@@ -122,6 +124,7 @@ e2e/                     # Tests con Playwright
 
 ### Extracción de comentarios
 - **Puppeteer Y Playwright**: Control avanzado del navegador
+- **Bridge Mode**: Integración visual con Midscene
 - **Midscene AI**: Extracción inteligente de comentarios
 - **Análisis de sentimiento**: La IA analiza cada comentario individualmente
 - **Detección de emociones**: Identifica alegría, enfado, tristeza o neutral
@@ -147,7 +150,6 @@ e2e/                     # Tests con Playwright
 - Solución temporal: reintentar la ejecución
 
 ### Planes de mejora
-- **Integrar Bridge Mode y Puppeteer**: Al usar la misma API, se puede unificar la lógica de extracción y seleccionar en tiempo de ejecución si usar Puppeteer o Bridge Mode.
 - **Robustez**: Mejorar manejo de errores y reintentos
 - **Estabilidad**: Perfeccionar los scripts existentes
 
