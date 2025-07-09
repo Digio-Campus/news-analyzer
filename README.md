@@ -76,43 +76,87 @@ Para la extraccion de comentarios, se necesita indicar una URL de noticia median
 $env:NEWS_URL="https://www.ejemplo.com/noticia"; npx playwright test comments.spec.ts
 ```
 
+### Analisis de comentarios usando API:
+
+Esta ultima implementación es la más rápida de todas, ya que intenta evitar el uso de un navegador. En su lugar, se usa la API de la pagina para extraer los comentarios.
+
+Se basa en 3 conceptos principales:
+
+#### **Extracción de API** 
+
+Se hace uso de un nuevo test E2E con Playwright que, al igual que antes, usa MidScene para buscar la sección de comentarios de una noticia pero no los extrae directamente, sino que captura el trafico de red con las llamadas a la API que usa la pagina para extraerlos y lo guarda en una carpeta `output`.
+
+Aunque no es necesario ejecutarlo manualmente, se puede ejecutar con el siguiente comando:
+
+```bash
+npx playwright test catchComments.spec.ts
+```
+
+#### **Fichero de configuración**
+
+Usando los request/responses capturados, se crea un fichero de configuración que indica como se deben hacer las llamdas a la API para extraer los comentarios. Este fichero se guarda en la carpeta `config/api-config.json`.
+
+Por ahora, este fichero se crea de manera manual, pero se planea automatizarlo en el futuro.
+
+
+#### **Script de extracción de comentarios**
+
+Script pricipal de extracción llamado `fetchComments.ts`, este intenta usar la API de la pagina, segun indica el fichero de configuración, para extraer los comentarios y guardarlos en un fichero llamado `output/comments_{id}.json`.
+
+En caso de error se llama a MidScene + Playwright como fallback para obtener los request/response nuevos, aunque como se ha dicho falta implementar que el fichero de configuración se actualice automaticamente usando estos nuevos valores.
+
+Finalmente, falta tambien implementar la estructuracion y analisis de los comentarios extraidos, que se guardan en un fichero `output/comments_{id}.json`.
+
+Para ejecutar el script de extracción de comentarios, se puede usar el siguiente comando:
+
+```bash
+npm run fetch-comments id_noticia "https://noticia.com"
+```
 
 ## 📁 Estructura del proyecto
 
 ```
 src/
-├── main.ts              # Punto de entrada principal
+├── main.ts                # Punto de entrada principal para Brifge Mode y Puppeteer
+├── fetchComments.ts       # Script de extracción de comentarios usando API
 │
-├── extractors/          # Extracción de comentarios
-│   ├── index.ts         # Punto de entrada para extractores
-│   ├── puppeteer.ts     # Extractor de comentarios con Puppeteer
-│   └── bridge.ts        # Extractor de comentarios con Bridge Mode
+├── extractors/            # Extracción de comentarios
+│   ├── index.ts           # Punto de entrada para extractores
+│   ├── puppeteer.ts       # Extractor de comentarios con Puppeteer
+│   └── bridge.ts          # Extractor de comentarios con Bridge Mode
 │
-├── analyzers/           # Análisis de comentarios
-│   └── index.ts         # Generación de estadísticas
+├── analyzers/             # Análisis de comentarios
+│   └── index.ts           # Generación de estadísticas
 │
-├── types/               # Tipos TypeScript
-│   └── index.ts         # Definición de Comment
+├── types/                 # Tipos TypeScript
+│   └── index.ts           # Definición de Comment
 │
-└── utils/               # Utilidades
-    |── extraction.ts    # Funciones de extracción de comentarios abstractas
-    └── index.ts         # Funciones auxiliares basicas
+└── utils/                 # Utilidades
+    |── extraction.ts      # Funciones de extracción de comentarios abstractas
+    ├── json.ts            # Funciones para parsear la configuración de la API
+    └── index.ts           # Funciones auxiliares basicas
 
 
 examples/
-└── basic-demo.ts        # Demo básico de Midscene con Puppeteer
+└── basic-demo.ts          # Demo básico de Midscene con Puppeteer
 
-e2e/                     # Tests con Playwright
-├── fixture.ts           # Configuración de tests
-├── comments.spec.ts     # Test de extracción de comentarios
-└── ebay-search.spec.ts  # Test de búsqueda en eBay
+e2e/                       # Tests con Playwright
+├── fixture.ts             # Configuración de tests
+|── ebay-search.spec.ts    # Test de búsqueda en eBay
+├── comments.spec.ts       # Test de extracción de comentarios
+└── catchComments.spec.ts  # Test de extracción de llamadas API
+
+config/                    # Ficheros de configuración
+└── api-config.json        # Configuración de la API para extracción de comentarios
 ```
+
 
 ## ⚙️ Scripts disponibles
 
 - `npm run start <url>` - Análisis de comentarios de una noticia con Puppeteer
 - `npm run start <url> bridge` - Análisis de comentarios de una noticia con Bridge Mode
 - `npm run demo` - Demo básico de Midscene para comprobar la integración con Puppeteer
+- `npm run fetch-comments <id> <url>` - Extraer comentarios de una noticia usando API
 - `npm run build` - Compilar TypeScript
 - `npm run dev` - Modo desarrollo con watch
 - `npm run lint` - Verificar código con ESLint
@@ -125,10 +169,10 @@ e2e/                     # Tests con Playwright
 ### Extracción de comentarios
 - **Puppeteer Y Playwright**: Control avanzado del navegador
 - **Bridge Mode**: Integración visual con Midscene
-- **Midscene AI**: Extracción inteligente de comentarios
+- **API de comentarios**: Extracción directa de comentarios mediante llamadas a la API
+- **Midscene AI**: Navegación asistida por IA para encontrar comentarios
 - **Análisis de sentimiento**: La IA analiza cada comentario individualmente
 - **Detección de emociones**: Identifica alegría, enfado, tristeza o neutral
-- **Scroll automático**: Busca comentarios en toda la página
 
 ### Análisis de estadísticas
 - Estadísticas de sentimiento (positivo/negativo/neutral)
@@ -136,11 +180,6 @@ e2e/                     # Tests con Playwright
 - Comentario más popular (por likes/reacciones)
 - Resumen estadístico completo
 
-### Testing
-- **Playwright**: Framework de testing E2E
-- **Midscene integration**: Tests con capacidades de IA
-- Tests funcionando correctamente
-- Ubicación: `e2e/` folder
 
 ## ⚠️ Problemas conocidos
 
@@ -152,7 +191,8 @@ e2e/                     # Tests con Playwright
 ### Planes de mejora
 - **Robustez**: Mejorar manejo de errores y reintentos
 - **Estabilidad**: Perfeccionar los scripts existentes
-
+- **Automatización**: Implementar generación automática de configuración de API
+- **Análisis de comentarios en API**: Estructurar y analizar comentarios extraídos por API
 
 
 ## 📚 Recursos
