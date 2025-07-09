@@ -1,5 +1,5 @@
 import 'dotenv/config'; // Cargar variables de entorno
-import { extractComments } from './extractors';
+import { extractCommentsPuppeteer } from './extractors';
 import { generateStats } from './analyzers';
 import { filterComments } from './utils';
 
@@ -17,7 +17,7 @@ async function main(newsUrl: string) {
 
   try {
     // Extraer comentarios
-    let comments = await extractComments(newsUrl);
+    let comments = await extractCommentsPuppeteer(newsUrl);
 
     // Validar y limpiar datos
     comments = filterComments(comments);
