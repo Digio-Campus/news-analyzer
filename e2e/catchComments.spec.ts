@@ -20,6 +20,9 @@ const ensureOutputDir = (currentDir) => {
   const dir = path.join(currentDir, '../output');
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
+  } else {
+    fs.rmSync(dir, { recursive: true });
+    fs.mkdirSync(dir);
   }
 };
 
@@ -38,7 +41,6 @@ test('Extraer comentarios de noticias', async ({
   aiTap,
   aiScroll,
 }) => {
-  
   //Crea la carpeta de salida si no existe
   const currentDir = getCurrentDir();
   ensureOutputDir(currentDir);
@@ -83,13 +85,11 @@ test('Extraer comentarios de noticias', async ({
   });
 
   // Busca la sección de comentarios con MidScene para que se cargue y generen las solicitudes
-  const hasCookieBanner = await aiBoolean(
-    'is there a cookie consent banner?'
-  );
+  const hasCookieBanner = await aiBoolean('is there a cookie consent banner?');
 
   if (hasCookieBanner) {
     await aiTap(`Accept the cookies and privacy policy.`);
-  } 
+  }
   await sleep(3000);
 
   // Use aiScroll to scroll to bottom
