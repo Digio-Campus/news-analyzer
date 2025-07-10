@@ -82,7 +82,7 @@ Esta ultima implementación es la más rápida de todas, ya que intenta evitar e
 
 Se basa en 3 conceptos principales:
 
-#### **Extracción de API** 
+#### **1. Extracción de API** 
 
 Se hace uso de un nuevo test E2E con Playwright que, al igual que antes, usa MidScene para buscar la sección de comentarios de una noticia pero no los extrae directamente, sino que captura el trafico de red con las llamadas a la API que usa la pagina para extraerlos y lo guarda en una carpeta `output`.
 
@@ -92,14 +92,14 @@ Aunque no es necesario ejecutarlo manualmente, se puede ejecutar con el siguient
 npx playwright test catchComments.spec.ts
 ```
 
-#### **Fichero de configuración**
+#### **2. Fichero de configuración**
 
 Usando los request/responses capturados, se crea un fichero de configuración que indica como se deben hacer las llamdas a la API para extraer los comentarios. Este fichero se guarda en la carpeta `config/api-config.json`.
 
 Por ahora, este fichero se crea de manera manual, pero se planea automatizarlo en el futuro.
 
 
-#### **Script de extracción de comentarios**
+#### **3. Script de extracción de comentarios**
 
 Script pricipal de extracción llamado `fetchComments.ts`, este intenta usar la API de la pagina, segun indica el fichero de configuración, para extraer los comentarios y guardarlos en un fichero llamado `output/comments_{id}.json`.
 
