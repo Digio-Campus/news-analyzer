@@ -7,6 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const outputDir = '../output/traffic';
+
 // Obtener el directorio actual de manera compatible con ESM y CommonJS
 const getCurrentDir = () => {
   if (typeof __dirname !== 'undefined') {
@@ -17,7 +19,7 @@ const getCurrentDir = () => {
 
 // Crea la carpeta si no existe
 const ensureOutputDir = (currentDir) => {
-  const dir = path.join(currentDir, '../output');
+  const dir = path.join(currentDir, outputDir);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   } else {
@@ -52,8 +54,8 @@ test('Extraer comentarios de noticias', async ({
     // Filtra las URLs que contienen '/comentarios' o '/comments'
     if (url.includes('/comentarios') || url.includes('/comments')) {
       const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const responseFilename = path.join(currentDir, '../output', `response-${timeStamp}.json`);
-      const requestFilename = path.join(currentDir, '../output', `request-${timeStamp}.json`);
+      const responseFilename = path.join(currentDir, outputDir, `response-${timeStamp}.json`);
+      const requestFilename = path.join(currentDir, outputDir, `request-${timeStamp}.json`);
 
       // Capturar request
       const request = response.request();
