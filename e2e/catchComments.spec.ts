@@ -52,35 +52,29 @@ test('Extraer comentarios de noticias', async ({
     // Filtra las URLs que contienen '/comentarios' o '/comments'
     if (url.includes('/comentarios') || url.includes('/comments')) {
       const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = path.join(currentDir, '../output', `response-${timeStamp}.json`);
+      const responseFilename = path.join(currentDir, '../output', `response-${timeStamp}.json`);
+      const requestFilename = path.join(currentDir, '../output', `request-${timeStamp}.json`);
 
-      try {
-        const json = await response.json();
-        fs.writeFileSync(filename, JSON.stringify(json, null, 2));
-        console.log('📥 Response guardada en', filename);
-      } catch (err) {
-        console.warn('❌ Error al parsear JSON de', url);
-      }
-    }
-  });
-
-  page.on('request', async (request) => {
-    const url = request.url();
-
-    // Filtra las URLs que contienen '/comentarios' o '/comments'
-    if (url.includes('/comentarios') || url.includes('/comments')) {
-      const timeStamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = path.join(currentDir, '../output', `request-${timeStamp}.json`);
-      
+      // Capturar request
+      const request = response.request();
       const requestData = {
         method: request.method(),
-        url,
+        url: request.url(),
         headers: request.headers(),
         postData: request.postData(),
       };
 
-      fs.writeFileSync(filename, JSON.stringify(requestData, null, 2));
-      console.log('📥 Request guardada en', filename);
+      const responseData = {
+        status: response.status(),  
+        headers: response.headers(),
+        body: await response.json().catch(() => null), // Maneja errores al parsear JSON
+      };
+
+      if(requestData && responseData) {
+        fs.writeFileSync(requestFilename, JSON.stringify(requestData, null, 2));  
+        fs.writeFileSync(responseFilename, JSON.stringify(responseData, null, 2));
+        console.log('📥 Response&Request guardadas');
+      } 
     }
   });
 
