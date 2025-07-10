@@ -1,7 +1,7 @@
 import { Comment } from '../types';
 
 export * from './extraction';
-export * from './json';
+export * from './api';
 
 // Función simple para hacer sleep
 export function sleep(ms: number): Promise<void> {
