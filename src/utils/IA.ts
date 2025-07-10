@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 import { OpenAI } from 'openai';  
 import { EndpointConfiguration } from '../types';
+
+dotenv.config();
 
 async function createPrompt(){
   //carga la lista de request/responses de output
