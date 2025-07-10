@@ -1,4 +1,5 @@
 import { fetchFromApi, runFallback } from './utils';
+import { generateConfigFile } from './utils/IA';
 
 (async () => {
   // Obtener Argumentos
@@ -32,6 +33,7 @@ import { fetchFromApi, runFallback } from './utils';
     console.log('🔁 Ejecutando MidScene + Playwright como fallback...');
 
     await runFallback(articleUrl);
+    await generateConfigFile();
 
     console.log(
       '🔄 Vuelve a ejecutar el script para probar con nueva API capturada.'
