@@ -1,14 +1,11 @@
 // Funcion para ejecutar el comando de Playwright como fallback para obtener nuevas requests/responses
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 
 export async function runFallback(articleUrl: string) {
+  
   return new Promise<void>((resolve, reject) => {
-    const midScene = spawn(
-      'npx',
-      ['playwright', 'test', 'e2e/catchComments.spec.ts'],
-      {
-        env: { ...process.env, NEWS_URL: articleUrl },
-        stdio: 'inherit',
+    const midScene = exec('npx playwright test e2e/catchComments.spec.ts', {
+      env: { ...process.env, NEWS_URL: articleUrl },
       }
     );
 
