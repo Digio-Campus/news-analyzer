@@ -34,20 +34,25 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 
-const projectRoot = path.resolve(process.cwd());
-const configPath = path.join(projectRoot, 'config', 'api-config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-const LIMIT = config.pagination.limit;
+
+function readConfig(projectRoot: string) {
+  const configPath = path.join(projectRoot, 'config', 'api-config.json');
+  return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+};
 
 export async function fetchFromApi(articleId: string) {
+  const projectRoot = path.resolve(process.cwd());
+  const config = readConfig(projectRoot);
+   
   let offset = 0;
   const allComments = [];
+  const limit = config.pagination.limit;
 
   while (true) {
     const url = config.endpoint
       .replace('{id}', articleId)
       .replace('{offset}', offset.toString())
-      .replace('{limit}', LIMIT.toString());
+      .replace('{limit}', limit.toString());
 
     const res = await fetch(url, { headers: config.headers });
     if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
