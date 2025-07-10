@@ -20,7 +20,10 @@ midscene_run/
 # Logs
 logs/
 *.log
+
+# Directorios de salida
 output/
+config/
 
 # Archivos del sistema
 .DS_Store
