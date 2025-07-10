@@ -101,8 +101,6 @@ async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
       throw new Error("La respuesta de Gemini está vacía.");
     }
 
-    console.log("Respuesta cruda de Gemini:", geminiResponseText);
-
     // Intenta parsear el JSON de la respuesta de Gemini
     // Gemini a menudo envuelve el JSON en bloques de código markdown
     const jsonMatch = geminiResponseText.match(/```json\n([\s\S]*?)\n```/);
