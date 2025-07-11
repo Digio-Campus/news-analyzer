@@ -84,7 +84,7 @@ Se basa en 3 conceptos principales:
 
 #### **1. Extracción de API** 
 
-Se hace uso de un nuevo test E2E con Playwright que, al igual que antes, usa MidScene para buscar la sección de comentarios de una noticia pero no los extrae directamente, sino que captura el trafico de red con las llamadas a la API que usa la pagina para extraerlos y lo guarda en una carpeta `output`.
+Se hace uso de un nuevo test E2E con Playwright que, al igual que antes, usa MidScene para buscar la sección de comentarios de una noticia pero no los extrae directamente, sino que captura el trafico de red con las llamadas a la API que usa la pagina para extraerlos y lo guarda en una carpeta `output/traffic`.
 
 Aunque no es necesario ejecutarlo manualmente, se puede ejecutar con el siguiente comando:
 
@@ -96,16 +96,17 @@ npx playwright test catchComments.spec.ts
 
 Usando los request/responses capturados, se crea un fichero de configuración que indica como se deben hacer las llamdas a la API para extraer los comentarios. Este fichero se guarda en la carpeta `config/api-config.json`.
 
-Por ahora, este fichero se crea de manera manual, pero se planea automatizarlo en el futuro.
+Este fichero se crea mediante una llamada a una IA, que dado el trafico capturado crea la configuración siguiendo la interfaz EndpointConfiguration definida en `src/types/index.ts`
 
 
 #### **3. Script de extracción de comentarios**
 
 Script pricipal de extracción llamado `fetchComments.ts`, este intenta usar la API de la pagina, segun indica el fichero de configuración, para extraer los comentarios y guardarlos en un fichero llamado `output/comments_{id}.json`.
 
-En caso de error se llama a MidScene + Playwright como fallback para obtener los request/response nuevos, aunque como se ha dicho falta implementar que el fichero de configuración se actualice automaticamente usando estos nuevos valores.
+Además, de la extracción de comentarios en raw (tal como los devuelve la API), se llama a una IA para formatear estos comentarios y realizar un análisis de sentimientos. Esta analiza cada comentario individualmente, identificando sentimientos y emociones (alegría, enfado, tristeza o neutral).
 
-Finalmente, falta tambien implementar la estructuracion y analisis de los comentarios extraidos, que se guardan en un fichero `output/comments_{id}.json`.
+En caso de error, se realizan de manera automatica los pasos anteriores, se llama a MidScene + Playwright como fallback para obtener los request/response nuevos, y luego se procesa de nuevo el trafico para generar un nuevo fichero de configuración, dejando el sistema en un estado consistente para la próxima ejecución.
+
 
 Para ejecutar el script de extracción de comentarios, se puede usar el siguiente comando:
 
@@ -128,13 +129,19 @@ src/
 ├── analyzers/             # Análisis de comentarios
 │   └── index.ts           # Generación de estadísticas
 │
+├── IA-calls/              # Llamadas a IA
+│   |── index.ts           # Punto de entrada para llamadas a IA
+│   ├── config.ts          # Generación de fichero de configuración para API
+│   └── analizeComments.ts # Análisis de comentarios usando IA
+│
 ├── types/                 # Tipos TypeScript
-│   └── index.ts           # Definición de Comment
+│   └── index.ts           # Definición de Comment, EndpointConfiguration y tipos auxiliares
 │
 └── utils/                 # Utilidades
-    |── extraction.ts      # Funciones de extracción de comentarios abstractas
-    ├── json.ts            # Funciones para parsear la configuración de la API
-    └── index.ts           # Funciones auxiliares basicas
+    |── extraction.ts      # Funciones de extracción de comentarios usando MidScene
+    ├── api.ts             # Funciones para realizar llamadas a la API
+    ├── fallback.ts        # Función fallback para ejecutar MidScene + Playwright
+    └── index.ts           # Funciones auxiliares basicas y punto de entrada
 
 
 examples/
@@ -146,8 +153,6 @@ e2e/                       # Tests con Playwright
 ├── comments.spec.ts       # Test de extracción de comentarios
 └── catchComments.spec.ts  # Test de extracción de llamadas API
 
-config/                    # Ficheros de configuración
-└── api-config.json        # Configuración de la API para extracción de comentarios
 ```
 
 
@@ -191,8 +196,6 @@ config/                    # Ficheros de configuración
 ### Planes de mejora
 - **Robustez**: Mejorar manejo de errores y reintentos
 - **Estabilidad**: Perfeccionar los scripts existentes
-- **Automatización**: Implementar generación automática de configuración de API
-- **Análisis de comentarios en API**: Estructurar y analizar comentarios extraídos por API
 
 
 ## 📚 Recursos
