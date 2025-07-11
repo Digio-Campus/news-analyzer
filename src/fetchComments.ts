@@ -1,5 +1,5 @@
 import { fetchFromApi, runFallback } from './utils';
-import { generateConfigFile } from './IA-calls';
+import { generateConfigFile, analizeComments } from './IA-calls';
 
 (async () => {
   // Obtener Argumentos
@@ -28,6 +28,7 @@ import { generateConfigFile } from './IA-calls';
 
   try {
     await fetchFromApi(articleId, articleUrl);
+    await analizeComments(articleId);
   } catch (err) {
     console.warn(`⚠️ Falló extracción directa: ${(err as Error).message}`);
     console.log('🔁 Ejecutando MidScene + Playwright como fallback...');
