@@ -1,23 +1,23 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { OpenAI } from 'openai';  
+import { OpenAI } from 'openai';
 import { EndpointConfiguration } from '../types';
 
 dotenv.config();
 
-async function createPrompt(){
+async function createPrompt() {
   //carga la lista de request/responses de output
   const projectRoot = path.resolve(process.cwd());
   const outputDir = path.join(projectRoot, 'output/traffic');
 
   //Obetner los archivos de request y response
   const files = fs.readdirSync(outputDir);
-  
-  const loadFilesByPrefix = (prefix : string) =>
+
+  const loadFilesByPrefix = (prefix: string) =>
     files
-      .filter(file => file.startsWith(prefix))
-      .map(file => {
+      .filter((file) => file.startsWith(prefix))
+      .map((file) => {
         const filePath = path.join(outputDir, file);
         return fs.readFileSync(filePath, 'utf-8'); // No se parsea
       });
@@ -25,7 +25,7 @@ async function createPrompt(){
   //Obtener lista de request/responses
   const requests = loadFilesByPrefix('request-');
   const responses = loadFilesByPrefix('response-');
-  
+
   //Generar cadenas de texto con las solicitudes y respuestas
   const requestString = requests.join('\n\n--- REQUEST ---\n\n');
   const responseString = responses.join('\n\n--- RESPONSE ---\n\n');
@@ -75,7 +75,7 @@ async function createPrompt(){
   Asegúrate de que el JSON resultante sea directamente parseable. NO incluyas ningún texto explicativo adicional, solo el JSON.
 `;
 
-return prompt;
+  return prompt;
 }
 
 async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
@@ -84,21 +84,25 @@ async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
   try {
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     });
 
     const response = await openai.chat.completions.create({
-      model: "gemini-2.5-flash-lite-preview-06-17",
+      model: 'gemini-2.5-flash-lite-preview-06-17',
       messages: [
-        { role: "system", content: "Eres un experto en APIs y generación de configuraciones para llamadas HTTP." },
-        { role: "user", content: promptContent },
+        {
+          role: 'system',
+          content:
+            'Eres un experto en APIs y generación de configuraciones para llamadas HTTP.',
+        },
+        { role: 'user', content: promptContent },
       ],
     });
 
     const geminiResponseText = response.choices[0]?.message?.content;
 
     if (!geminiResponseText) {
-      throw new Error("La respuesta de Gemini está vacía.");
+      throw new Error('La respuesta de Gemini está vacía.');
     }
 
     // Intenta parsear el JSON de la respuesta de Gemini
@@ -111,16 +115,18 @@ async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
 
     const config = JSON.parse(jsonString) as EndpointConfiguration;
     return config;
-
   } catch (error) {
-    console.error("Error al llamar a la API de Gemini (vía SDK de OpenAI) o parsear la respuesta:", error);
-    throw new Error("Fallo al generar la configuración con Gemini.");
+    console.error(
+      'Error al llamar a la API de Gemini (vía SDK de OpenAI) o parsear la respuesta:',
+      error
+    );
+    throw new Error('Fallo al generar la configuración con Gemini.');
   }
 }
 
-export async function generateConfigFile(){
+export async function generateConfigFile() {
   const config = await generateConfigWithGemini();
-  console.log("Configuración generada con éxito:");
+  console.log('Configuración generada con éxito:');
 
   const projectRoot = path.resolve(process.cwd());
   const configPath = path.join(projectRoot, 'config', 'api-config.json');
