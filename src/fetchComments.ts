@@ -27,7 +27,7 @@ import { generateConfigFile } from './IA-calls';
   }
 
   try {
-    await fetchFromApi(articleId);
+    await fetchFromApi(articleId, articleUrl);
   } catch (err) {
     console.warn(`⚠️ Falló extracción directa: ${(err as Error).message}`);
     console.log('🔁 Ejecutando MidScene + Playwright como fallback...');
