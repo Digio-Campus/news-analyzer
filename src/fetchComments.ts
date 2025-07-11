@@ -1,5 +1,5 @@
 import { fetchFromApi, runFallback } from './utils';
-import { generateConfigFile } from './utils/IA';
+import { generateConfigFile } from './IA-calls';
 
 (async () => {
   // Obtener Argumentos

@@ -9,7 +9,7 @@ dotenv.config();
 async function createPrompt(){
   //carga la lista de request/responses de output
   const projectRoot = path.resolve(process.cwd());
-  const outputDir = path.join(projectRoot, 'output');
+  const outputDir = path.join(projectRoot, 'output/traffic');
 
   //Obetner los archivos de request y response
   const files = fs.readdirSync(outputDir);
