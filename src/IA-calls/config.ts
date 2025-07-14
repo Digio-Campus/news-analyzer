@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { OpenAI } from 'openai';
 import { EndpointConfiguration } from '../types';
+import { obtainPageNameFromUrl } from '../utils';
 
 dotenv.config();
 
@@ -124,12 +125,14 @@ async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
   }
 }
 
-export async function generateConfigFile() {
+export async function generateConfigFile(articleUrl: string): Promise<void> {
   const config = await generateConfigWithGemini();
   console.log('Configuración generada con éxito:');
 
   const projectRoot = path.resolve(process.cwd());
-  const configPath = path.join(projectRoot, 'config', 'api-config.json');
+  const pageName = obtainPageNameFromUrl(articleUrl);
+  const configFileName = `api-config_${pageName}.json`;
+  const configPath = path.join(projectRoot, 'config', configFileName);
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   console.log(`Configuración guardada en: ${configPath}`);
 }

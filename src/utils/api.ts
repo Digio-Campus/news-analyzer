@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import { EndpointConfiguration } from '../types';
+import { obtainPageNameFromUrl } from '.';
 
 // Función para obtener valores anidados de un objeto json
 function getNestedValue(obj: any, path: string): any {
@@ -18,8 +19,10 @@ function replacePlaceholders(
 }
 
 // Función que obtiene la configuración de la API desde un archivo JSON
-function readConfig(projectRoot: string): EndpointConfiguration {
-  const configPath = path.join(projectRoot, 'config', 'api-config.json');
+function readConfig(projectRoot: string, articleUrl: string): EndpointConfiguration {
+  const pageName = obtainPageNameFromUrl(articleUrl);
+  const configFileName = `api-config_${pageName}.json`;
+  const configPath = path.join(projectRoot, 'config', configFileName);
   return JSON.parse(
     fs.readFileSync(configPath, 'utf-8')
   ) as EndpointConfiguration;
@@ -28,7 +31,7 @@ function readConfig(projectRoot: string): EndpointConfiguration {
 export async function fetchFromApi(articleId: string, articleUrl: string) {
   // Obtener la configuración de la API
   const projectRoot = path.resolve(process.cwd());
-  const endpointConfig = readConfig(projectRoot);
+  const endpointConfig = readConfig(projectRoot, articleUrl);
 
   //Inicializar paginación
   let currentPage =

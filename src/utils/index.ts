@@ -23,3 +23,9 @@ export const filterComments = (commentsData: Comment[]): Comment[] => {
 
   return validComments;
 };
+
+export function obtainPageNameFromUrl(url: string): string {
+  const parsedUrl = new URL(url);
+  return parsedUrl.hostname.replace(/^www\./, '').replace(/\..*$/, ''); // elimina "www." y lo que sigue al primer punto
+}
+

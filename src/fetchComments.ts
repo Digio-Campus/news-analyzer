@@ -34,7 +34,7 @@ import { generateConfigFile, analizeComments } from './IA-calls';
     console.log('🔁 Ejecutando MidScene + Playwright como fallback...');
 
     await runFallback(articleUrl);
-    await generateConfigFile();
+    await generateConfigFile(articleUrl);
 
     console.log(
       '🔄 Vuelve a ejecutar el script para probar con nueva API capturada.'
