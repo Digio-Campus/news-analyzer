@@ -75,7 +75,7 @@ async function createPrompt() {
       - 'hasMorePagesOperator': El operador para evaluar si hay más páginas (opcional, si no se puede determinar, omite este campo), infiere esta propiedad del nombre del campo. En caso de ser booleano, usa 'truthy' si es true/false, 'falsy' si es false/true, o '===' si es igual a un valor específico.
       - 'hasMorePagesValue': El valor que se compara con 'hasMorePagesField' (opcional, si no se puede determinar, omite este campo) en caso de que el operador sea de comparación.
       - 'nextPageIncrement': ¿Es paginación por 'offset' (incremento de 30) o por 'página' (incremento de 1)?
-      - 'pageParameterName': El nombre del parámetro en la URL ('offset' o 'pagina').
+      - 'pageParameterName': El nombre del parámetro en la URL ('offset' o 'pagina'), recuerda que debe coincidir con el nombre que le has dado en parameters.
 
   Asegúrate de que el JSON resultante sea directamente parseable. NO incluyas ningún texto explicativo adicional, solo el JSON.
 `;
