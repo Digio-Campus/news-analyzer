@@ -50,6 +50,8 @@ async function createPrompt() {
     paginationFields: {
       commentsArrayPath: string; // Ruta al array de comentarios en la respuesta (e.g., "data.items", "items")
       hasMorePagesField: string; // Ruta al campo que indica si hay más páginas (e.g., "options.available", "lastPage")
+      hasMorePagesOperator?: 'truthy' | 'falsy' | '===' | '!==' | '>' | '<'; // Opcional, operador para evaluar si hay más páginas
+      hasMorePagesValue?: any; // Valor para comparar con hasMorePagesField
       nextPageIncrement: number;  // Cuánto incrementar el parámetro de paginación (e.g., 30 para offset, 1 para page)
       pageParameterName: string;  // Nombre del parámetro de la URL para la paginación (e.g., "offset", "pagina")
     };
@@ -64,12 +66,14 @@ async function createPrompt() {
   ${responseString}
 
   Por favor, genera SÓLO el objeto JSON de tipo 'EndpointConfiguration' basándote en esta información. Identifica cuidadosamente:
-  1.  El 'urlTemplate' exacto, usando placeholders como '{articleId}', '{offset}', '{limit}', '{page}' si los detectas. Si no hay un límite explícito, asume 30 como defaultValue para '{limit}'.
+  1.  El 'urlTemplate' exacto, usando placeholders como '{articleId}', '{offset}', '{limit}', '{page}' si los detectas. 
   2.  Los 'parameters' para cada placeholder en la 'urlTemplate'.
   3.  Los 'headers' relevantes que el navegador envió, si se usa la URL de la página como referencia introducela como placeholder también como '{articleUrl}'.
   4.  La 'paginationFields':
       - 'commentsArrayPath': La ruta más probable al array de comentarios.
-      - 'hasMorePagesField': La ruta al campo en la respuesta que indica si hay más comentarios o páginas. Presta atención a si 'true' significa que *no hay* más páginas (como 'lastPage' en El Mundo).
+      - 'hasMorePagesField': La ruta al campo en la respuesta que indica si hay más comentarios o páginas. 
+      - 'hasMorePagesOperator': El operador para evaluar si hay más páginas (opcional, si no se puede determinar, omite este campo), infiere esta propiedad del nombre del campo. En caso de ser booleano, usa 'truthy' si es true/false, 'falsy' si es false/true, o '===' si es igual a un valor específico.
+      - 'hasMorePagesValue': El valor que se compara con 'hasMorePagesField' (opcional, si no se puede determinar, omite este campo) en caso de que el operador sea de comparación.
       - 'nextPageIncrement': ¿Es paginación por 'offset' (incremento de 30) o por 'página' (incremento de 1)?
       - 'pageParameterName': El nombre del parámetro en la URL ('offset' o 'pagina').
 
