@@ -28,7 +28,9 @@ async function createPrompt() {
   const responses = loadFilesByPrefix('response-');
 
   if (requests.length === 0 || responses.length === 0) {
-    throw new Error('No se encontraron solicitudes o respuestas en el directorio de salida.');
+    throw new Error(
+      'No se encontraron solicitudes o respuestas en el directorio de salida.'
+    );
   }
 
   //Generar cadenas de texto con las solicitudes y respuestas
