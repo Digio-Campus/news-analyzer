@@ -35,14 +35,19 @@ export function evaluateHasMore(
   comparisonValue?: any
 ): boolean {
   switch (operator) {
-    case 'truthy': return !!value;
-    case 'falsy': return !value;
-    case '===': return value === comparisonValue;
-    case '!==': return value !== comparisonValue;
-    case '>': return value > comparisonValue;
-    case '<': return value < comparisonValue;
-    default: return !!value;
+    case 'truthy':
+      return !!value;
+    case 'falsy':
+      return !value;
+    case '===':
+      return value === comparisonValue;
+    case '!==':
+      return value !== comparisonValue;
+    case '>':
+      return value > comparisonValue;
+    case '<':
+      return value < comparisonValue;
+    default:
+      return !!value;
   }
 }
-
-
