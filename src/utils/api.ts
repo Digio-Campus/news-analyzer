@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 import { EndpointConfiguration } from '../types';
-import { obtainPageNameFromUrl } from '.';
+import { evaluateHasMore, obtainPageNameFromUrl } from '.';
 
 // Función para obtener valores anidados de un objeto json
 function getNestedValue(obj: any, path: string): any {
@@ -19,7 +19,10 @@ function replacePlaceholders(
 }
 
 // Función que obtiene la configuración de la API desde un archivo JSON
-function readConfig(projectRoot: string, articleUrl: string): EndpointConfiguration {
+function readConfig(
+  projectRoot: string,
+  articleUrl: string
+): EndpointConfiguration {
   const pageName = obtainPageNameFromUrl(articleUrl);
   const configFileName = `api-config_${pageName}.json`;
   const configPath = path.join(projectRoot, 'config', configFileName);
@@ -80,9 +83,19 @@ export async function fetchFromApi(articleId: string, articleUrl: string) {
     allComments.push(...comments);
 
     // Comrpobar si hay más comentarios y actualizar la página
-    const hasMoreComments = getNestedValue(
-      json,
-      endpointConfig.paginationFields.hasMorePagesField
+    // Obtener el valor de la propiedad que indica si hay más páginas, adaptando a la API
+    const {
+      hasMorePagesField,
+      hasMorePagesOperator = 'truthy',
+      hasMorePagesValue,
+    } = endpointConfig.paginationFields;
+
+    const hasMoreRaw = getNestedValue(json, hasMorePagesField);
+
+    const hasMoreComments = evaluateHasMore(
+      hasMoreRaw,
+      hasMorePagesOperator,
+      hasMorePagesValue
     );
 
     if (!hasMoreComments || comments.length === 0) {
