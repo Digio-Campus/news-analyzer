@@ -22,6 +22,8 @@ export interface EndpointConfiguration {
   paginationFields: {
     commentsArrayPath: string;
     hasMorePagesField: string;
+    hasMorePagesOperator?: 'truthy' | 'falsy' | '===' | '!==' | '>' | '<'; 
+    hasMorePagesValue?: any; 
     nextPageIncrement: number;
     pageParameterName: string;
   };

@@ -29,3 +29,20 @@ export function obtainPageNameFromUrl(url: string): string {
   return parsedUrl.hostname.replace(/^www\./, '').replace(/\..*$/, ''); // elimina "www." y lo que sigue al primer punto
 }
 
+export function evaluateHasMore(
+  value: any,
+  operator: 'truthy' | 'falsy' | '===' | '!==' | '>' | '<' = 'truthy',
+  comparisonValue?: any
+): boolean {
+  switch (operator) {
+    case 'truthy': return !!value;
+    case 'falsy': return !value;
+    case '===': return value === comparisonValue;
+    case '!==': return value !== comparisonValue;
+    case '>': return value > comparisonValue;
+    case '<': return value < comparisonValue;
+    default: return !!value;
+  }
+}
+
+
