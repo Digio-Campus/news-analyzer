@@ -11,6 +11,11 @@ export function generateStats(comments: Comment[]) {
     return;
   }
 
+  // Comentario con mas likes
+  const mostLikedComment = comments.reduce((prev, current) =>
+    prev.likes > current.likes ? prev : current
+  );
+
   // Análisis de sentimientos
   const sentimentStats = {
     positivos: comments.filter((c) => c.sentiment === 'positivo').length,
@@ -45,6 +50,10 @@ export function generateStats(comments: Comment[]) {
   console.log('📈 === ESTADÍSTICAS GENERALES ===');
   console.log(`   📝 Total comentarios: ${totalComments}`);
 
+  console.log(
+    `   👍 Comentario más popular: "${mostLikedComment.content}" con ${mostLikedComment.likes} likes`
+  );
+
   console.log('\n🎭 === ANÁLISIS DE SENTIMIENTO ===');
   console.log(
     `   😊 Positivos: ${sentimentStats.positivos} (${Math.round((sentimentStats.positivos / totalComments) * 100)}%)`
@@ -71,12 +80,4 @@ export function generateStats(comments: Comment[]) {
     `   😶 Neutral: ${emotionStats.neutral} (${Math.round((emotionStats.neutral / totalComments) * 100)}%)`
   );
   console.log(`   🎯 Emoción predominante: ${mostCommonEmotion}`);
-
-  return {
-    totalComments,
-    sentimentStats,
-    emotionStats,
-    mostCommonSentiment,
-    mostCommonEmotion,
-  };
 }
