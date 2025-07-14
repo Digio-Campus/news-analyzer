@@ -66,7 +66,7 @@ async function createPrompt() {
   Por favor, genera SÓLO el objeto JSON de tipo 'EndpointConfiguration' basándote en esta información. Identifica cuidadosamente:
   1.  El 'urlTemplate' exacto, usando placeholders como '{articleId}', '{offset}', '{limit}', '{page}' si los detectas. Si no hay un límite explícito, asume 30 como defaultValue para '{limit}'.
   2.  Los 'parameters' para cada placeholder en la 'urlTemplate'.
-  3.  Los 'headers' relevantes que el navegador envió.
+  3.  Los 'headers' relevantes que el navegador envió, si se usa la URL de la página como referencia introducela como placeholder también como '{articleUrl}'.
   4.  La 'paginationFields':
       - 'commentsArrayPath': La ruta más probable al array de comentarios.
       - 'hasMorePagesField': La ruta al campo en la respuesta que indica si hay más comentarios o páginas. Presta atención a si 'true' significa que *no hay* más páginas (como 'lastPage' en El Mundo).
