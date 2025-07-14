@@ -32,7 +32,7 @@ test.beforeEach(async ({ page }) => {
   const newsUrl = process.env.NEWS_URL;
   expect(newsUrl).toBeTruthy();
 
-  await page.setViewportSize({ width: 400, height: 905 });
+  await page.setViewportSize({ width: 700, height: 905 });
   await page.goto(newsUrl!);
   await page.waitForLoadState('load');
 });
@@ -81,39 +81,106 @@ test('Extraer comentarios de noticias', async ({
   });
 
   // Busca la sección de comentarios con MidScene para que se cargue y generen las solicitudes
-  const hasCookieBanner = await aiBoolean('is there a cookie consent banner?');
 
+  //Acepta las cookies si es necesario
+  const hasCookieBanner = await aiBoolean('is there a cookie consent banner?');
   if (hasCookieBanner) {
     await aiTap(`Accept the cookies and privacy policy.`);
   }
   await sleep(3000);
 
-  // Use aiScroll to scroll to bottom
-  await aiScroll({
-    direction: 'down',
-    scrollType: 'untilBottom',
-  });
-  await sleep(3000); // Espera para que se cargue el contenido
+  // Buscar botones de comentarios en la sección superior
+  const lookForCommentsButton = async () => aiBoolean('¿existe un botón de comentarios?');
+  let hasCommentsButton = false;
+  let UpperAttempts = 0;
 
-  // Use aiScroll to scroll to the comments section
-  const checkCommentsSection = async () =>
-    aiBoolean('¿existe una sección de comentarios o reseñas?');
+  while (!hasCommentsButton && UpperAttempts < 2) {
+    hasCommentsButton = await lookForCommentsButton();
+    if (hasCommentsButton) {
+      await aiTap(`Clique en el botón de comentarios`);
+      break; // Si se encuentra el botón, salir del bucle
+   } 
 
-  let hasComments = await checkCommentsSection();
-  let attempts = 0;
-
-  while (!hasComments && attempts < 5) {
     await aiScroll({
-      direction: 'up',
+      direction: 'down',
       distance: 700,
       scrollType: 'once',
     });
     await sleep(1000);
 
+    // Revisa nuevamente si hay un botón de comentarios
+    UpperAttempts++;
+  }
+  await sleep(3000); // Espera para que se cargue el contenido
+
+  // Si no se encontró un botón de comentarios en la parte superior, buscar en la parte inferior
+  let hasComments = false;
+  if (!hasCommentsButton) {
+    // Use aiScroll to scroll to bottom
+    await aiScroll({
+      direction: 'down',
+      scrollType: 'untilBottom',
+    });
+    await sleep(3000); // Espera para que se cargue el contenido
+
+    // Use aiScroll to scroll to the comments section
+    const checkCommentsSection = async () =>
+      aiBoolean('¿existe una sección de comentarios o reseñas?');
+
     hasComments = await checkCommentsSection();
-    attempts++;
+    let attempts = 0;
+
+    while (!hasComments && attempts < 5) {
+      await aiScroll({
+        direction: 'up',
+        distance: 700,
+        scrollType: 'once',
+      });
+      await sleep(1000);
+
+      hasComments = await checkCommentsSection();
+      attempts++;
+    }
   }
 
-  expect(hasComments).toBeTruthy();
-  await sleep(2000); // Espera para que se cargue el contenido
+  expect(hasComments || hasCommentsButton).toBeTruthy();
+
+  // Verifica que la sección de comentarios se haya cargado, con un retry
+  let loadedComments =  await aiBoolean('Es visible el encabezado de la sección de comentarios?');
+  if (!loadedComments) {
+    aiScroll({
+      direction: 'down',  
+      distance: 800,
+      scrollType: 'once',
+    });
+    await sleep(3000); // Espera para que se cargue el contenido
+    loadedComments = await aiBoolean('Es visible el encabezado de la sección de comentarios?');
+  }
+  expect(loadedComments).toBeTruthy();
+
+  // Navega por los comentarios buscando el maximizar el trafico de red
+  let commentsAttempts = 0;
+  while (commentsAttempts < 8) {
+   
+    const moreCommentsButton = await aiBoolean('¿existe un botón de "Cargar más comentarios"?');
+    const commentsAvailable = await aiBoolean('¿Se puede seguir scrolleando en la sección de comentarios?');
+
+    if (!commentsAvailable && !moreCommentsButton) {
+      break; // Si no se puede seguir scrolleando y no hay botón, salir del bucle
+    } 
+
+    if(moreCommentsButton) {
+      await aiTap(`Cargar más comentarios`);
+    }
+
+    await aiScroll({
+      direction: 'down',
+      distance: 1500,
+      scrollType: 'once',
+    });
+    await sleep(1000);
+
+    commentsAttempts++;
+  }
+
 });
