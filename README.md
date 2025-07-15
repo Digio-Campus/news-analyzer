@@ -86,6 +86,8 @@ Se basa en 3 conceptos principales:
 
 Se hace uso de un nuevo test E2E con Playwright que, al igual que antes, usa MidScene para buscar la sección de comentarios de una noticia pero no los extrae directamente, sino que captura el trafico de red con las llamadas a la API que usa la pagina para extraerlos y lo guarda en una carpeta `output/traffic`.
 
+Para detalles de su implementación, ver la sección ["Implementación de la extracción de API"](#implementación-de-la-extracción-de-api) al final del README.
+
 Aunque no es necesario ejecutarlo manualmente, se puede ejecutar con el siguiente comando:
 
 ```bash
@@ -209,3 +211,19 @@ e2e/                       # Tests con Playwright
 - Node.js >= 18.0.0
 - API key de Gemini
 - Navegador compatible con Puppeteer/Playwright
+
+## Anexo
+
+### Implementación de la extracción de API
+
+La implementación de la extracción de API se basa en capturar el tráfico de red de la página web para identificar las llamadas a la API que se utilizan para cargar los comentarios. Esto se realiza mediante un test E2E con Playwright que utiliza MidScene para navegar hasta la sección de comentarios y capturar las solicitudes HTTP.
+
+El test al iniciarse empieza a capturar el tráfico de red y, buscando todas las responses que llegan y filtrando aquellas que en su url tienen las palabras 'comentarios' o 'comments', para cada respuesta obtiene su request asociada y guarda ambas en respectivos ficheros dentro de la carpeta `output/traffic/`.
+
+El analisis de MidScene es el más conciencudo de los implementados, y se basa en varias estrategias:
+1. **Cookies**: Comprueba si hay un boton de cookies y en ese caso se aceptan.
+2. **Boton de comentarios**: Al acceder a la noticia, comprueba si o bien hay ya un botón de comentarios visible o bien si tras hacer un scroll aparece.
+   1. **Búsquedad de comentarios**: Si no se ha encontrado el botón de comentarios, entonces scrollea hasta abajo de la página para intentar que cargen y empieza a subir poco a poco hasta que encuentra los comentarios, con un maximo de 5 intentos.
+3. **Navegación por la sección de comentarios**: Una vez que se ha encontrado la sección de comentarios, ya sea por pulsar el botón o por scroll, se navega por esta intentado generar el mayor número posible de solicitudes de la API para capturar más trafico y poder dar más información a la IA.
+   1. **Cargar más comentarios**: Durante la navegación, si hay un botón de "Cargar más comentarios", se pulsa para poder seguir explorando. 
+   2. **Máximo de iteraciones**: Para evitar que el test se quede atascado, se establece un máximo de 8 iteraciones para cargar más comentarios.
