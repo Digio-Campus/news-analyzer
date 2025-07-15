@@ -136,6 +136,7 @@ async function generateConfigWithGemini(): Promise<EndpointConfiguration> {
 }
 
 export async function generateConfigFile(articleUrl: string): Promise<void> {
+  console.log('🔍 Generando configuración de API con IA');
   const config = await generateConfigWithGemini();
   console.log('Configuración generada con éxito:');
 
